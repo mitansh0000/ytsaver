@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YTsaver</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>YTsaver</h1>
+        <form id="download-form" action="{{ url_for('download') }}" method="POST">
+            <input type="text" name="url" placeholder="Enter YouTube URL" required>
+            <select name="format">
+                <option value="best">Best Quality</option>
+                <option value="worst">Lowest Quality</option>
+                <option value="bestaudio">Best Audio</option>
+            </select>
+            <input type="hidden" name="sid" id="sid">
+            <button type="submit">Download</button>
+        </form>
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+        <div class="toggle-theme">
+            <input type="checkbox" id="theme-toggle">
+            <label for="theme-toggle">Dark Mode</label>
+        </div>
+    </div>
+    <script>
+        const socket = io();
+        const form = document.getElementById('download-form');
+        const progress = document.getElementById('progress');
+        const sid = document.getElementById('sid');
+        sid.value = socket.id;
+
+        form.addEventListener('submit', () => {
+            progress.style.width = '0%';
+        });
+
+        socket.on('progress', (data) => {
+            progress.style.width = data.progress;
+        });
+
+        const toggle = document.getElementById('theme-toggle');
+        toggle.addEventListener('change', () => {
+            document.body.classList.toggle('dark-mode');
+        });
+    </script>
+</body>
+</html>
